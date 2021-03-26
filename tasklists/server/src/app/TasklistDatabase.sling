@@ -29,7 +29,6 @@ func forContext(ctx as LoggingContext) static as this
     var v = new this()
     v.setDb(db)
     return v
-    
 }
 
 func updateTable(table as SQLTableInfo)
@@ -49,8 +48,6 @@ func updateTables
     task.addStringKeyColumn("id")
     task.addStringColumn("name")
     task.addStringColumn("description")
-    task.addLongColumn("timeStampAdded")
-    task.addLongColumn("timeStampLastUpdated")
     updateTable(task)
 }
 
@@ -79,7 +76,7 @@ func deleteTask(id as string) as bool
     return db.executeSync(db.prepareDeleteStatementSync(TASK, criteria.toDynamicMap()))
 }
 
-func getTasks as DynamicMap
+func geTask as DynamicMap
 {
     var v = new vector<Task>
     var it = assert db.querySync(db.prepareQueryAllStatementSync(TASK)):
