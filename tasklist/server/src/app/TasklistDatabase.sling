@@ -9,39 +9,42 @@ class:
 
 model Task
 {
-    id as string
-    name as string
+    id as string 
+    name as string 
     description as string
     timeStampAdded as long
     timeStampLastUpdated as long
 }
 
-const TASK = "task"
+const TASK  = "task"
 pvar db as MySQLDatabase
+
 
 func forContext(ctx as LoggingContext) static as this
 {
     var cstr = EnvironmentVariable.get("TASK_DATABASE")
-    Log.debug(ctx, "Opening database connection: `"..cstr.."'")
-    db = MySQLDatabase.forConnectionStringSync(ctx, cstr)
+    Log.debug(ctx, "Opening database connection: `" ..cstr.. "'")
+    db = MySQLDatabase.forConnectionStringSync(ctx,cstr)
     if not db:
-        Error.throw("failedToConnectToDatabase",cstr)
+        Error.throw("failedToConnectToDatabase", cstr)
     var v = new this()
     v.setDb(db)
-    return v
-    
+    return v 
 }
+
+
+
 
 func updateTable(table as SQLTableInfo)
 {
     if not table:
         Error.throw("nullTable","updateTable")
-    if not db:
-        Error.throw("nullDb","updateTable")
+    if not db: 
+        Error.throw("nullDb", "updateTable")
     if not db.ensureTableExistsSync(table):
-        Error.throw("failedToUpdateTable",table.getName())
-    
+        Error.throw("failedToUpdateTable", table.getName())
 }
+
 
 func updateTables
 {
@@ -52,6 +55,7 @@ func updateTables
     task.addLongColumn("timeStampAdded")
     task.addLongColumn("timeStampLastUpdated")
     updateTable(task)
+
 }
 
 func addTask(task as Task) as Task
@@ -59,7 +63,7 @@ func addTask(task as Task) as Task
     assert task
     task.setId("1")
     task.setTimeStampAddedValue(SystemClock.asUTCSeconds())
-    assert db.executeSync(db.prepareInsertStatementSync(TASK, task.toDynamicMap()))
+    assert db.executeSync(db.prepareInsertStatementSync(TASK,task.toDynamicMap()))
     return task
 }
 
@@ -84,9 +88,9 @@ func getTasks as DynamicMap
     var v = new vector<Task>
     var it = assert db.querySync(db.prepareQueryAllStatementSync(TASK)):
         return null
-    while it{
+    while it {
         var o = it.next()
-        if  not o:
+        if not o:
             break
         var task = Task.forJsonObject(o)
         if not task:
@@ -95,15 +99,12 @@ func getTasks as DynamicMap
     }
     var data = new DynamicMap()
     data.setObject("records", v)
-    return data 
+    return data
 }
 
 func close
 {
-    if  db:
+    if db:
         db.closeSync()
-    
     db = null
 }
-
-

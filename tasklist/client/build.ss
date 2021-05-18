@@ -1,9 +1,11 @@
 #! eqela ss-0.21
 #
-# This file is part of Sling Tasklist 
-# Copyrigth (c) 2021 Eqela 
-# All rigth reserved.
+# This file is part of Simple Hello World
+# Copyright (c) 2021 Eqela
+# All rights resereved.
 #
 lib sling-tools:0.45.0
 import sling.tools.compiler
+
 SlingCompilerTool.forWeb5ApplicationDirectory("app").executeScript(args)
+

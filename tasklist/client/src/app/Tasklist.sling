@@ -1,42 +1,76 @@
-import jk.widget.common 
+import jk.widget.common
 
-class is TitledWidget #widget: 
+class is TitledWidget #widget:
 
 ui LayerWidget
 {
     VerticalScrollerWidget{
-        scrollBarDisabled = true 
-        LayerWithBackgroundColorWidget container{
-            color = Color.white()
-            VerticalBoxWidget list{
-                margin = context.getHeightValue("5mm") 
+        scrollBarDisabled = true
+        LayerWithBackgroundColorWidget container {
+            color = Color.black()
+            VerticalBoxWidget list {
+                margin = context.getHeightValue("5mm")
                 spacing = context.getHeightValue("5mm")
+
+                LabelWidget myLabel {
+                    text ="Adding TASK"
+                    textColor = Color.white()
+                }
+
+                TextInputWidget addingTaskTextbox {
+                    type = TextInputWidget.TYPE_NAME
+                    placeholder = "Add Task"
+                    backgroundColor = Color.white()
+                    fontSize = context.getHeightValue("5mm")
+                    padding = context.getHeightValue("1mm")
+                } 
+                TextButtonWidget btnAddTask : 1.0 {
+                    text = "ADD as new Task"
+                    backgroundColor = Color.instance("#3716e9")
+                    fontSize = context.getHeightValue("5mm")
+                    clickHandler = func {
+                        var task = new Task()
+                        Task.setFname(addingTaskTextbox.getWidgetText())
+
+                        APIClient.getInstance().addTask(task.toDynamicMap(), func(response as DynamicMap), error {
+                            if not response
+                                addingTaskTextbox.setWidgetText("")
+                            context.showMessageDialog(error)
+                    }
+                }
+                LabelWidget myName {
+                    text ="Christian Jay N. Epe"
+                    fontSize = context.getHeightValue("3mm")
+                    textColor = Color.white()
+                }
             }
         }
+        
     }
 }
 
 func initializeWidget override
 {
-    base.initializeWidget() 
+    base.initializeWidget()
     APIClient.getInstance().getTasks(func(response as DynamicMap) {
-        var data = assert response.getDynamicMap("data") 
-        var records = data.getDynamicVector("records") 
+        var data = assert response.getDynamicMap("data")
+        var records = data.getDynamicVector("records")
         if not records || records.getSize() < 1 {
-            list.addWidget(AlignWidget.forWidget(context, LabelWidget.forText(context, "no record")), 1.0) 
-
+            list.addWidget(AlignWidget.forWidget(context, LabelWidget.forText(context, "No record")), 1.0)
         }
-        else{
-            foreach record as DynamicMap in records.toVector(){
-                var task = record.getString("name") .." - "  .. record.getString("description") 
-                var lblTask = LabelWidget.forText(context, task) 
-                var hbox = HorizontalBoxWidget.forContext(context, 0, context.getHeightValue("0.5mm")) 
-                hbox.addWidget(lblTask) 
-                list.addWidget(AlignWidget.forWidget(context,hbox),1.0) 
+        else {
+            foreach record as DynamicMap in records.toVector() {
+                    var task = record.getString("name") .. " - " .. record.getString("description")
+                    var lblTask = LabelWidget.forText(context, task)
+                    var hbox = HorizontalBoxWidget.forContext(context, 0, context.getHeightValue("0.5mm"))
+                    hbox.addWidget(lblTask)
+                    list.addWidget(AlignWidget.forWidget(context, hbox), 1.0)
             }
         }
     })
+
 }
 
 func getWidgetTitle as string:
-     return "Task list"
+    return "Task list"
+
